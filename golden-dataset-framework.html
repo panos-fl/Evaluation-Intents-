@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Golden Dataset Development Framework</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"><\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"><\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"><\/script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;color:#e2e8f0;font-family:'IBM Plex Sans',-apple-system,sans-serif}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#0a0e1a}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+button{font-family:inherit}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>window.__TASKS__=[{"id": 1, "name": "Intent / Query Classification", "desc": "What is the user trying to do?", "complexity": 1, "general": {"level": "primary", "simple": "\u2713 Primary", "detail": "Can classify common intents with clear rubrics. Struggles with ambiguous or compound intents."}, "external": {"level": "enhanced", "simple": "\u2713 Enhanced", "detail": "Better judgment on domain-specific intents. Can design richer taxonomies."}, "internal": {"level": "minimal", "simple": "\u25cb Overkill", "detail": "Rarely needed. Only justified when intents map to internal routing logic."}, "typicalGov": {"sensitivity": 0, "access": 0, "infra": 0, "location": 0, "audit": 0, "lifecycle": 0}, "govNotes": "Usually feasible with synthetic or anonymized queries. Low governance friction.", "rubricDesignTier": "external", "rubricExecTier": "general", "rubricNotes": "External experts define the intent taxonomy and boundary conditions. General annotators execute once examples are clear. Calibration focuses on ambiguous intents spanning multiple categories."}, {"id": 2, "name": "Document Extraction Verification", "desc": "Are extracted fields correct?", "complexity": 1, "general": {"level": "primary", "simple": "\u2713 Primary", "detail": "Can verify clearly formatted fields against source documents."}, "external": {"level": "enhanced", "simple": "\u2713 Enhanced", "detail": "Can verify domain-specific fields and catch semantic extraction errors."}, "internal": {"level": "minimal", "simple": "\u25cb Overkill", "detail": "Only needed for proprietary document formats or internal coding systems."}, "typicalGov": {"sensitivity": 1, "access": 1, "infra": 0, "location": 0, "audit": 1, "lifecycle": 1}, "govNotes": "Source documents often contain PII. If de-identification is possible, tiers open up.", "rubricDesignTier": "external", "rubricExecTier": "general", "rubricNotes": "Domain experts define which fields to extract, acceptable formats, and error tolerances. General annotators verify against rubric."}, {"id": 3, "name": "Response Fluency & Tone", "desc": "Is the output clear, professional, and audience-appropriate?", "complexity": 1, "general": {"level": "primary", "simple": "\u2713 Primary", "detail": "Can judge grammar, clarity, readability, and general professionalism."}, "external": {"level": "enhanced", "simple": "\u2713 Enhanced", "detail": "Can evaluate domain-appropriate register and terminology usage."}, "internal": {"level": "useful", "simple": "\u2713 Useful", "detail": "Knows the company's actual voice, brand guidelines, and customer communication standards."}, "typicalGov": {"sensitivity": 0, "access": 0, "infra": 0, "location": 0, "audit": 0, "lifecycle": 0}, "govNotes": "Agent responses can usually be evaluated without exposing source data. Minimal governance impact.", "rubricDesignTier": "internal", "rubricExecTier": "general", "rubricNotes": "Internal SMEs provide brand voice guidelines and customer segment expectations. High subjectivity makes calibration especially important."}, {"id": 4, "name": "Retrieval Relevance Scoring", "desc": "Is the retrieved chunk actually useful for answering this query?", "complexity": 2, "general": {"level": "limited", "simple": "\u25b3 Limited", "detail": "Can judge surface-level topical relevance. Struggles to assess genuine usefulness."}, "external": {"level": "primary", "simple": "\u2713 Primary", "detail": "Distinguishes topical overlap from genuine relevance. Understands domain context."}, "internal": {"level": "enhanced", "simple": "\u2713 Enhanced", "detail": "Knows which internal documents are authoritative, outdated, or superseded."}, "typicalGov": {"sensitivity": 2, "access": 1, "infra": 1, "location": 1, "audit": 1, "lifecycle": 1}, "govNotes": "Retrieved chunks come from the internal knowledge base \u2014 often contain proprietary processes.", "rubricDesignTier": "internal", "rubricExecTier": "external", "rubricNotes": "Internal SMEs define what 'relevant' means \u2014 which sources are authoritative, what constitutes sufficient coverage. External experts score against this definition."}, {"id": 5, "name": "KB Curation & Validation", "desc": "Is source content accurate, current, complete?", "complexity": 2, "general": {"level": "minimal", "simple": "\u2717 Ineffective", "detail": "Cannot judge domain accuracy or currency. Limited to formatting checks."}, "external": {"level": "useful", "simple": "\u2713 Useful", "detail": "Can identify generally outdated domain information. Cannot verify against internal policy changes."}, "internal": {"level": "primary", "simple": "\u2605 Critical", "detail": "Only tier that knows what's outdated, missing, or misleading."}, "typicalGov": {"sensitivity": 2, "access": 2, "infra": 1, "location": 1, "audit": 2, "lifecycle": 2}, "govNotes": "Requires direct access to internal knowledge base content.", "rubricDesignTier": "internal", "rubricExecTier": "internal", "rubricNotes": "Both design and execution require internal SMEs. Only they know what's outdated, what policies changed, and where documentation diverges from practice."}, {"id": 6, "name": "Factual Accuracy Verification", "desc": "Is the agent's output correct against source material?", "complexity": 2, "general": {"level": "limited", "simple": "\u25b3 Limited", "detail": "Can do direct string-matching verification. Cannot assess interpretation correctness."}, "external": {"level": "primary", "simple": "\u2713 Primary", "detail": "Can verify claims against domain knowledge and catch misinterpretations."}, "internal": {"level": "enhanced", "simple": "\u2713 Enhanced", "detail": "Verifies against institutional ground truth \u2014 recent changes, undocumented exceptions."}, "typicalGov": {"sensitivity": 2, "access": 1, "infra": 1, "location": 1, "audit": 1, "lifecycle": 1}, "govNotes": "Verifying accuracy requires seeing both agent output and source material.", "rubricDesignTier": "internal", "rubricExecTier": "external", "rubricNotes": "Internal SMEs define ground truth \u2014 which sources are canonical, how to handle conflicting information. External experts verify against these definitions."}, {"id": 7, "name": "Hallucination Detection", "desc": "Did the agent fabricate, distort, or unsupportably infer?", "complexity": 3, "general": {"level": "limited", "simple": "\u25b3 Limited", "detail": "Catches obvious fabrications. Misses plausible-sounding but wrong claims."}, "external": {"level": "primary", "simple": "\u2713 Primary", "detail": "Domain knowledge catches 'plausible hallucinations' that sound right but aren't."}, "internal": {"level": "enhanced", "simple": "\u2713 Enhanced", "detail": "Catches the hardest hallucinations: fabricated internal policies, invented exceptions."}, "typicalGov": {"sensitivity": 2, "access": 1, "infra": 1, "location": 1, "audit": 1, "lifecycle": 1}, "govNotes": "Detecting hallucinations about internal processes usually requires access to those processes.", "rubricDesignTier": "internal", "rubricExecTier": "external", "rubricNotes": "Internal SMEs define the hallucination taxonomy \u2014 fabrication, distortion, unsupported inference. They provide domain-specific examples. External experts execute detection."}, {"id": 8, "name": "Tool Selection & Parameterization", "desc": "Did the agent pick the right action/API with correct inputs?", "complexity": 3, "general": {"level": "minimal", "simple": "\u2717 Ineffective", "detail": "Cannot judge tool selection without understanding the action space."}, "external": {"level": "useful", "simple": "\u2713 Useful", "detail": "Can evaluate general approach. Cannot judge proprietary API parameters."}, "internal": {"level": "primary", "simple": "\u2605 Critical", "detail": "Knows the actual systems, capabilities, constraints, and failure modes."}, "typicalGov": {"sensitivity": 2, "access": 2, "infra": 2, "location": 1, "audit": 2, "lifecycle": 2}, "govNotes": "Evaluating tool use typically requires understanding internal system architecture.", "rubricDesignTier": "internal", "rubricExecTier": "internal", "rubricNotes": "Both design and execution require internal SMEs who understand the systems, valid action spaces, parameter constraints, and correct sequencing."}, {"id": 9, "name": "Conversation Flow & Multi-Turn Eval", "desc": "Is the agent effective across a full dialogue arc?", "complexity": 3, "general": {"level": "limited", "simple": "\u25b3 Limited", "detail": "Can judge basic coherence. Cannot assess whether the conversation achieved the right outcome."}, "external": {"level": "useful", "simple": "\u2713 Useful", "detail": "Can evaluate conversation structure and professional dialogue management."}, "internal": {"level": "primary", "simple": "\u2605 Critical", "detail": "Knows actual resolution paths, escalation triggers, and whether the conversation solves the real problem."}, "typicalGov": {"sensitivity": 2, "access": 2, "infra": 1, "location": 1, "audit": 2, "lifecycle": 2}, "govNotes": "Multi-turn conversations often accumulate sensitive context. Real conversation logs contain PII.", "rubricDesignTier": "internal", "rubricExecTier": "internal", "rubricNotes": "Internal SMEs define 'successful' conversations \u2014 correct resolution paths, escalation points, required information gathering sequence."}, {"id": 10, "name": "Policy & Compliance Checking", "desc": "Does the agent's decision comply with rules and regulations?", "complexity": 4, "general": {"level": "minimal", "simple": "\u2717 Ineffective", "detail": "Cannot assess policy compliance without domain and institutional knowledge."}, "external": {"level": "useful", "simple": "\u2713 Useful", "detail": "Can check against published regulations. Cannot verify internal policies."}, "internal": {"level": "primary", "simple": "\u2605 Critical", "detail": "Only reliable source for internal policy compliance. Knows the real rules and exceptions."}, "typicalGov": {"sensitivity": 3, "access": 3, "infra": 2, "location": 2, "audit": 3, "lifecycle": 2}, "govNotes": "Almost always requires real production scenarios with regulated data.", "rubricDesignTier": "internal", "rubricExecTier": "internal", "rubricNotes": "Internal compliance and legal stakeholders must design the rubric \u2014 encoding regulations AND internal policy interpretations, including exceptions."}, {"id": 11, "name": "Multi-Step Reasoning Validation", "desc": "Is the agent's chain-of-thought logically sound?", "complexity": 4, "general": {"level": "minimal", "simple": "\u2717 Ineffective", "detail": "Cannot evaluate complex reasoning chains without domain understanding."}, "external": {"level": "useful", "simple": "\u2713 Useful", "detail": "Can evaluate logical structure and catch invalid inferences."}, "internal": {"level": "primary", "simple": "\u2605 Critical", "detail": "Knows the actual decision trees, exception handling, and correct reasoning chains."}, "typicalGov": {"sensitivity": 2, "access": 2, "infra": 2, "location": 1, "audit": 2, "lifecycle": 2}, "govNotes": "Reasoning chains reference internal logic, business rules, and often specific case data.", "rubricDesignTier": "internal", "rubricExecTier": "internal", "rubricNotes": "Internal SMEs map valid reasoning pathways, required decision points, and acceptable inference chains."}, {"id": 12, "name": "Edge Case & Failure Mode ID", "desc": "Proactively surfacing scenarios the system doesn't handle", "complexity": 4, "general": {"level": "minimal", "simple": "\u2717 Ineffective", "detail": "Cannot generate meaningful edge cases without domain knowledge."}, "external": {"level": "limited", "simple": "\u25b3 Limited", "detail": "Can identify common domain edge cases. Cannot anticipate institution-specific failures."}, "internal": {"level": "primary", "simple": "\u2605 Critical", "detail": "Irreplaceable source of 'war stories' \u2014 weird cases, workarounds, undocumented exceptions."}, "typicalGov": {"sensitivity": 3, "access": 3, "infra": 2, "location": 2, "audit": 2, "lifecycle": 2}, "govNotes": "The most valuable edge cases come from real production incidents involving real data.", "rubricDesignTier": "internal", "rubricExecTier": "internal", "rubricNotes": "This task resists rubric-driven approaches \u2014 the value is in surfacing what the rubric doesn't cover. Rubric evolves continuously as new failure modes are discovered."}];<\/script>
+<script type="text/babel">
+const { useState } = React;
+const tasks = window.__TASKS__;
+
+const govDims = [
+  {key:"sensitivity",name:"Data Sensitivity",desc:"How toxic is the underlying data?",levels:[
+    {label:"Public / Synthetic",short:"Public",desc:"No real customer data."},
+    {label:"Internal / Confidential",short:"Internal",desc:"Proprietary processes, no PII."},
+    {label:"Restricted (PII / Financial)",short:"Restricted",desc:"Contains customer PII or financial data."},
+    {label:"Regulated (HIPAA / SOX / OCC)",short:"Regulated",desc:"Subject to specific regulatory frameworks."}]},
+  {key:"access",name:"Access Authorization",desc:"Who is allowed to see and interact with this data?",levels:[
+    {label:"Open / NDA Only",short:"Open",desc:"Any annotator with standard NDA."},
+    {label:"Vetted Vendor",short:"Vetted",desc:"Requires vendor security review, SOC 2."},
+    {label:"Background-Checked",short:"Checked",desc:"Individual background checks required."},
+    {label:"Employee / Role-Based Only",short:"Employee",desc:"Only client employees with role-based access."}]},
+  {key:"infra",name:"Infrastructure & Residency",desc:"How must systems connect?",levels:[
+    {label:"Cloud / Anywhere",short:"Cloud",desc:"Any secure device, any location."},
+    {label:"Client VPN Required",short:"VPN",desc:"Must connect through client network."},
+    {label:"Client VDI / Secure Enclave",short:"VDI",desc:"Client-provisioned virtual desktops."},
+    {label:"On-Prem / Air-Gapped",short:"On-Prem",desc:"Physical presence or air-gapped systems."}]},
+  {key:"location",name:"Annotator Location & Jurisdiction",desc:"Where can the human physically sit?",levels:[
+    {label:"Unrestricted",short:"Anywhere",desc:"Any location, any country."},
+    {label:"Country-Limited",short:"Country",desc:"Must be within specified country (e.g., US only)."},
+    {label:"State / Region-Limited",short:"State",desc:"Must be within specific state or region (e.g., data residency laws)."},
+    {label:"Client Facility Only",short:"On-Site",desc:"Must be physically present at client location."}]},
+  {key:"audit",name:"Audit & Lineage",desc:"Can you prove who did what, when?",levels:[
+    {label:"Minimal / Best-Effort",short:"Minimal",desc:"Basic timestamps and user IDs."},
+    {label:"Standard Tracking",short:"Standard",desc:"Full annotation provenance."},
+    {label:"Enhanced / Regulatory",short:"Enhanced",desc:"Tamper-proof logs, reviewer sign-off."},
+    {label:"Full Chain-of-Custody",short:"Full CoC",desc:"Every data touch logged with legal defensibility."}]},
+  {key:"lifecycle",name:"Data Lifecycle Rights",desc:"What happens after annotation is complete?",levels:[
+    {label:"Unrestricted Use",short:"Unrestricted",desc:"Training, eval, retained indefinitely."},
+    {label:"Training + Evaluation",short:"Train+Eval",desc:"Both, with contractual limits."},
+    {label:"Evaluation Only",short:"Eval Only",desc:"Solely for evaluation/benchmarking."},
+    {label:"Session-Only / Destroy After",short:"Destroy",desc:"Data destroyed after session."}]}
+];
+
+function getGovConstraints(g){
+  const r={general:{available:true,reasons:[]},external:{available:true,reasons:[]},internal:{available:true,reasons:[]}};
+  if(g.sensitivity>=2){r.general.available=false;r.general.reasons.push("Data too sensitive for general annotators")}
+  if(g.sensitivity>=3){r.external.reasons.push("Regulated data — external access heavily restricted")}
+  if(g.access>=2){r.general.available=false;r.general.reasons.push("Background check eliminates crowd workers")}
+  if(g.access>=3){r.general.available=false;r.external.available=false;r.external.reasons.push("Employee-only access — external experts excluded")}
+  if(g.infra>=2){r.general.available=false;r.general.reasons.push("VDI requirement incompatible with crowd platforms");r.external.reasons.push("VDI/on-prem access difficult for external parties")}
+  if(g.infra>=3){r.external.available=false;r.external.reasons.push("On-prem — requires physical presence")}
+  if(g.location>=1){r.general.reasons.push("Location restrictions limit annotator pool to specific country")}
+  if(g.location>=2){r.general.available=false;r.general.reasons.push("State/region restriction incompatible with distributed crowd annotation")}
+  if(g.location>=2){r.external.reasons.push("State/region restriction limits available external experts")}
+  if(g.location>=3){r.general.available=false;r.external.available=false;r.external.reasons.push("Client facility only — requires physical presence at client site")}
+  if(g.audit>=3){r.general.available=false;r.general.reasons.push("Full chain-of-custody incompatible with crowd annotation")}
+  if(g.lifecycle>=3){r.general.available=false;r.general.reasons.push("Session-only destruction not enforceable with crowd platforms")}
+  for(const t of Object.keys(r))r[t].reasons=[...new Set(r[t].reasons)];
+  return r;
+}
+
+const lc={primary:"#10b981",enhanced:"#3b82f6",useful:"#8b5cf6",limited:"#f59e0b",minimal:"#6b7280"};
+const cxL={1:"Foundational",2:"Intermediate",3:"Advanced",4:"Expert-Critical"};
+const cxC={1:"#94a3b8",2:"#60a5fa",3:"#a78bfa",4:"#f472b6"};
+const tL={general:"General Annotators",external:"External Domain Experts",internal:"Internal Client SMEs"};
+const tC={general:"#3b82f6",external:"#8b5cf6",internal:"#f472b6"};
+const th={padding:"14px 12px",textAlign:"left",fontSize:10,color:"#475569",fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",borderBottom:"1px solid #1e293b"};
+const td={padding:"12px",borderBottom:"1px solid #1e293b22",verticalAlign:"top"};
+const badge=(c)=>({display:"inline-block",padding:"3px 10px",borderRadius:5,fontSize:11,fontWeight:600,background:c+"22",color:c,border:`1px solid ${c}33`});
+
+// ═══ TAB 1: TASK MATRIX ═══
+function TaskMatrix(){
+  const[view,setView]=useState("simple");
+  const tiers=[{key:"general",label:"General Annotators",sub:"Trainable non-specialists"},{key:"external",label:"External Domain Experts",sub:"Credentialed SMEs outside org"},{key:"internal",label:"Internal Client SMEs",sub:"People who do the work today"}];
+  const grouped={};tasks.forEach(t=>{if(!grouped[t.complexity])grouped[t.complexity]=[];grouped[t.complexity].push(t)});
+  return <div>
+    <div style={{display:"flex",gap:4,marginBottom:24,background:"#1e293b",borderRadius:8,padding:4,width:"fit-content"}}>
+      {["simple","detailed"].map(v=><button key={v} onClick={()=>setView(v)} style={{padding:"6px 16px",borderRadius:6,border:"none",cursor:"pointer",fontSize:12,fontWeight:500,background:view===v?"#334155":"transparent",color:view===v?"#e2e8f0":"#64748b"}}>{v[0].toUpperCase()+v.slice(1)}</button>)}
+    </div>
+    <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:20}}>
+      {[{l:"primary",n:"Primary Fit"},{l:"enhanced",n:"Enhanced Value"},{l:"useful",n:"Useful"},{l:"limited",n:"Limited"},{l:"minimal",n:"Ineffective / Overkill"}].map(x=>
+        <div key={x.l} style={{display:"flex",alignItems:"center",gap:5}}><div style={{width:10,height:10,borderRadius:2,background:lc[x.l],opacity:0.9}}/><span style={{fontSize:10,color:"#94a3b8",fontWeight:500}}>{x.n}</span></div>)}
+    </div>
+    <div style={{overflowX:"auto"}}>
+      <table style={{width:"100%",borderCollapse:"separate",borderSpacing:0}}>
+        <thead><tr><th style={{...th,width:36,textAlign:"center"}}>#</th><th style={{...th,width:"22%"}}>Task Type</th>
+          {tiers.map(t=><th key={t.key} style={{...th,borderLeft:"1px solid #1e293b33"}}><div style={{fontSize:12,fontWeight:600,color:"#e2e8f0"}}>{t.label}</div><div style={{fontSize:10,color:"#64748b",fontWeight:400}}>{t.sub}</div></th>)}</tr></thead>
+        <tbody>{Object.keys(grouped).sort().flatMap(c=>grouped[c].map((task,tIdx)=><tr key={task.id}>
+          <td style={{...td,textAlign:"center",borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}><span style={{fontSize:11,fontFamily:"'IBM Plex Mono',monospace",color:"#475569"}}>{task.id}</span></td>
+          <td style={{...td,borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}>
+            {tIdx===0&&<div style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:cxC[c],marginBottom:4,opacity:0.8}}>{cxL[c]}</div>}
+            <div style={{fontSize:12,fontWeight:600,color:"#e2e8f0",marginBottom:2}}>{task.name}</div>
+            <div style={{fontSize:10,color:"#64748b"}}>{task.desc}</div></td>
+          {tiers.map(tier=>{const cell=task[tier.key];const clr=lc[cell.level];return <td key={tier.key} style={{...td,borderLeft:"1px solid #1e293b22",borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}>
+            {view==="simple"?<div style={{display:"flex",justifyContent:"center"}}><span style={badge(clr)}>{cell.simple}</span></div>
+            :<div><span style={{...badge(clr),fontSize:10,padding:"2px 8px",marginBottom:6}}>{cell.simple}</span><p style={{fontSize:11,color:"#94a3b8",lineHeight:1.5,margin:0}}>{cell.detail}</p></div>}
+          </td>})}
+        </tr>))}</tbody>
+      </table>
+    </div>
+  </div>;
+}
+
+// ═══ TAB 2: GOVERNANCE ═══
+function GovernanceTab(){
+  return <div style={{display:"flex",flexDirection:"column",gap:20}}>
+    {govDims.map((dim,i)=><div key={dim.key} style={{background:"#111827",borderRadius:12,border:"1px solid #1e293b",overflow:"hidden"}}>
+      <div style={{padding:"18px 22px 14px",borderBottom:"1px solid #1e293b"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+          <span style={{fontSize:11,fontWeight:700,color:"#475569",fontFamily:"'IBM Plex Mono',monospace"}}>{"0"+(i+1)}</span>
+          <h3 style={{fontSize:16,fontWeight:700,color:"#e2e8f0",margin:0}}>{dim.name}</h3></div>
+        <p style={{fontSize:12,color:"#94a3b8",lineHeight:1.6,margin:0,maxWidth:700}}>{dim.desc}</p></div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)"}}>
+        {dim.levels.map((level,li)=>{const intensity=li/3;return <div key={li} style={{padding:"14px 16px",borderRight:li<3?"1px solid #1e293b33":"none",background:`rgba(${30+intensity*60},${20+intensity*10},${40+intensity*30},${0.3+intensity*0.3})`,position:"relative"}}>
+          {li===0&&<div style={{position:"absolute",top:4,left:8,fontSize:8,color:"#475569",fontWeight:600,letterSpacing:"0.08em"}}>LOW FRICTION →</div>}
+          {li===3&&<div style={{position:"absolute",top:4,right:8,fontSize:8,color:"#f472b6",fontWeight:600,letterSpacing:"0.08em"}}>HIGH FRICTION</div>}
+          <div style={{fontSize:12,fontWeight:600,color:"#e2e8f0",marginBottom:4,marginTop:(li===0||li===3)?10:0}}>{level.label}</div>
+          <p style={{fontSize:10,color:"#94a3b8",lineHeight:1.5,margin:0}}>{level.desc}</p></div>})}
+      </div></div>)}
+  </div>;
+}
+
+// ═══ TAB 3: COMBINED FILTER ═══
+function CombinedView(){
+  const[sel,setSel]=useState(0);const[gov,setGov]=useState({sensitivity:0,access:0,infra:0,location:0,audit:0,lifecycle:0});const[showT,setShowT]=useState(false);
+  const task=tasks[sel];const con=getGovConstraints(gov);const anyG=Object.values(gov).some(v=>v>0);
+  const tiers=[{key:"general",label:"General Annotators",icon:"👥"},{key:"external",label:"External Domain Experts",icon:"🎓"},{key:"internal",label:"Internal Client SMEs",icon:"🏢"}];
+  const sc=v=>v===0?"#10b981":v<=1?"#3b82f6":v<=2?"#f59e0b":"#ef4444";
+  return <div style={{display:"flex",gap:24,flexWrap:"wrap"}}>
+    <div style={{flex:"1 1 340px",minWidth:320}}>
+      <label style={{fontSize:10,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",display:"block",marginBottom:8}}>Select Task</label>
+      <div style={{display:"flex",flexDirection:"column",gap:3}}>
+        {tasks.map((t,i)=><button key={t.id} onClick={()=>{setSel(i);setShowT(false)}} style={{padding:"8px 12px",borderRadius:6,border:`1px solid ${sel===i?cxC[t.complexity]+"66":"#1e293b"}`,background:sel===i?cxC[t.complexity]+"11":"#0f172a",color:sel===i?"#e2e8f0":"#64748b",cursor:"pointer",textAlign:"left",fontSize:11,fontWeight:500,display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontFamily:"'IBM Plex Mono',monospace",fontSize:10,color:cxC[t.complexity],fontWeight:600,minWidth:18}}>{t.id}</span>{t.name}</button>)}
+      </div></div>
+    <div style={{flex:"2 1 560px",minWidth:400}}>
+      <div style={{background:"#111827",borderRadius:12,padding:"18px 22px",marginBottom:16,border:`1px solid ${cxC[task.complexity]}33`}}>
+        <span style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:cxC[task.complexity]}}>{cxL[task.complexity]}</span>
+        <h3 style={{fontSize:18,fontWeight:700,color:"#e2e8f0",margin:"6px 0 4px"}}>{task.name}</h3>
+        <p style={{fontSize:12,color:"#94a3b8",margin:0}}>{task.desc}</p></div>
+      <div style={{background:"#111827",borderRadius:12,padding:"18px 22px",marginBottom:16,border:"1px solid #1e293b"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+          <span style={{fontSize:11,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase"}}>Apply Governance Constraints</span>
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={()=>{setGov({...task.typicalGov});setShowT(true)}} style={{padding:"4px 10px",borderRadius:5,border:"1px solid #334155",background:"#1e293b",color:"#94a3b8",fontSize:10,fontWeight:500,cursor:"pointer"}}>Typical for this task</button>
+            <button onClick={()=>{setGov({sensitivity:0,access:0,infra:0,location:0,audit:0,lifecycle:0});setShowT(false)}} style={{padding:"4px 10px",borderRadius:5,border:"1px solid #334155",background:"#1e293b",color:"#94a3b8",fontSize:10,fontWeight:500,cursor:"pointer"}}>Reset all</button></div></div>
+        {govDims.map(dim=><div key={dim.key} style={{marginBottom:14}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+            <span style={{fontSize:12,fontWeight:600,color:"#cbd5e1"}}>{dim.name}</span>
+            <span style={{fontSize:10,fontWeight:600,padding:"2px 8px",borderRadius:4,background:sc(gov[dim.key])+"22",color:sc(gov[dim.key])}}>{dim.levels[gov[dim.key]].short}</span></div>
+          <div style={{display:"flex",gap:4}}>{dim.levels.map((_,li)=><button key={li} onClick={()=>{setGov(p=>({...p,[dim.key]:li}));setShowT(false)}} style={{flex:1,height:8,borderRadius:4,border:"none",cursor:"pointer",background:li<=gov[dim.key]?sc(gov[dim.key]):"#1e293b"}}/>)}</div></div>)}
+        {showT&&<div style={{marginTop:12,padding:"10px 14px",background:"#1e293b",borderRadius:8,border:"1px solid #334155"}}><p style={{fontSize:11,color:"#94a3b8",lineHeight:1.6,margin:0}}><span style={{color:"#e2e8f0",fontWeight:600}}>Typical scenario: </span>{task.govNotes}</p></div>}
+      </div>
+      <div style={{background:"#111827",borderRadius:12,padding:"18px 22px",border:"1px solid #1e293b"}}>
+        <span style={{fontSize:11,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",display:"block",marginBottom:16}}>Annotator Availability After Governance</span>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          {tiers.map(tier=>{const cell=task[tier.key];const clr=lc[cell.level];const g=con[tier.key];
+            const stC=!g.available?"#ef4444":g.reasons.length>0?"#f59e0b":"#10b981";
+            const stL=!g.available?"✗ Blocked":g.reasons.length>0?"⚠ Restricted":"✓ Available";
+            return <div key={tier.key} style={{padding:"16px 18px",borderRadius:10,border:`1px solid ${stC}33`,background:stC+"08",opacity:!g.available?0.7:1}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,flexWrap:"wrap",gap:8}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:18}}>{tier.icon}</span><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0"}}>{tier.label}</div></div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{...badge(clr),fontSize:10,padding:"2px 8px"}}>Skill: {cell.simple}</span>
+                  <span style={{...badge(stC),fontSize:10,padding:"2px 8px"}}>{stL}</span></div></div>
+              {!g.available&&g.reasons.length>0&&<div style={{marginTop:4}}>{g.reasons.map((r,ri)=><div key={ri} style={{fontSize:11,color:"#ef4444",lineHeight:1.5,display:"flex",gap:6,marginBottom:2}}><span style={{color:"#ef444488",fontSize:9,marginTop:3}}>●</span>{r}</div>)}</div>}
+              {g.available&&g.reasons.length>0&&<div style={{marginTop:4}}>{g.reasons.map((r,ri)=><div key={ri} style={{fontSize:11,color:"#f59e0b",lineHeight:1.5,display:"flex",gap:6,marginBottom:2}}><span style={{color:"#f59e0b88",fontSize:9,marginTop:3}}>●</span>{r}</div>)}</div>}
+              {g.available&&g.reasons.length===0&&!anyG&&<div style={{fontSize:11,color:"#64748b",fontStyle:"italic"}}>No governance constraints applied</div>}
+              {g.available&&g.reasons.length===0&&anyG&&<div style={{fontSize:11,color:"#10b981"}}>Current governance posture allows full access</div>}
+            </div>})}
+        </div>
+        {!con.general.available&&con.external.available&&<div style={{marginTop:16,padding:"12px 16px",borderRadius:8,background:"#3b82f611",border:"1px solid #3b82f633"}}><p style={{fontSize:11,color:"#93c5fd",lineHeight:1.6,margin:0}}><span style={{fontWeight:700}}>Governance reduces available tiers. </span>General annotators are blocked by data sensitivity or access controls. External domain experts remain viable if the task requirements align with their credentials and access level.</p></div>}
+        {!con.general.available&&!con.external.available&&<div style={{marginTop:16,padding:"12px 16px",borderRadius:8,background:"#f472b611",border:"1px solid #f472b633"}}><p style={{fontSize:11,color:"#f9a8d4",lineHeight:1.6,margin:0}}><span style={{fontWeight:700}}>Only internal SMEs remain. </span>Governance has eliminated all external annotator tiers. At this constraint level, annotation workflows must run entirely within the enterprise perimeter using credentialed employees with role-based access.</p></div>}
+      </div>
+    </div>
+  </div>;
+}
+
+// ═══ TAB 4: RUBRIC DESIGN & CALIBRATION ═══
+function RubricTab(){
+  const[selectedTask,setSelectedTask]=useState(null);
+  const tierRank={general:0,external:1,internal:2};
+  const lifecycle=[
+    {label:"Design",desc:"Define hard rules/guardrails, evaluation criteria, scoring dimensions, and boundary examples.",color:"#3b82f6"},
+    {label:"Pilot",desc:"Small-batch annotation. Identify ambiguities, missing categories, edge cases the rubric doesn't cover.",color:"#8b5cf6"},
+    {label:"Calibrate",desc:"Measure inter-annotator agreement. Resolve disagreements. Refine rubric language.",color:"#a78bfa"},
+    {label:"Deploy",desc:"Roll rubric to full annotation team. Provide training materials and worked examples.",color:"#10b981"},
+    {label:"Monitor",desc:"Track agreement metrics over time. Detect drift as policies change or new edge cases emerge.",color:"#f59e0b"},
+    {label:"Refine",desc:"Update rubric based on monitoring data and adjudication outcomes. Return to Pilot for major changes.",color:"#f472b6"}];
+  const grouped={};tasks.forEach(t=>{if(!grouped[t.complexity])grouped[t.complexity]=[];grouped[t.complexity].push(t)});
+  return <div>
+    <div style={{background:"#111827",borderRadius:12,padding:"16px 24px 12px",marginBottom:16,border:"1px solid #334155"}}>
+      <p style={{fontSize:12,color:"#94a3b8",lineHeight:1.5,margin:0,fontStyle:"italic"}}>A complete rubric has two layers. Rubric design requires a higher annotator tier than rubric execution.</p></div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}}>
+      <div style={{background:"#111827",borderRadius:12,border:"1px solid #ef444466",overflow:"hidden"}}>
+        <div style={{background:"#ef4444",padding:"10px 18px"}}><span style={{fontSize:13,fontWeight:700,color:"#fff"}}>Hard Rules / Guardrails — Binary (Pass / Fail)</span></div>
+        <div style={{padding:"14px 18px"}}>
+          <p style={{fontSize:11,color:"#cbd5e1",lineHeight:1.55,margin:"0 0 10px 0"}}>Hard boundaries that gate all other scoring. A response that violates a guardrail fails regardless of quality scores.</p>
+          <p style={{fontSize:10,color:"#64748b",lineHeight:1.5,margin:"0 0 10px 0",fontStyle:"italic"}}>"Never disclose account numbers" · "Must cite a source document" · "Cannot recommend unapproved products"</p>
+          <p style={{fontSize:10,color:"#f472b6",fontWeight:600,margin:0}}>Typically authored by: Compliance / Legal / Internal SMEs</p></div></div>
+      <div style={{background:"#111827",borderRadius:12,border:"1px solid #3b82f666",overflow:"hidden"}}>
+        <div style={{background:"#3b82f6",padding:"10px 18px"}}><span style={{fontSize:13,fontWeight:700,color:"#fff"}}>Principles / Eval Criteria — Gradient (Scored)</span></div>
+        <div style={{padding:"14px 18px"}}>
+          <p style={{fontSize:11,color:"#cbd5e1",lineHeight:1.55,margin:"0 0 10px 0"}}>Quality dimensions scored along a spectrum. Where inter-annotator calibration matters most — these require judgment, not just rule-checking.</p>
+          <p style={{fontSize:10,color:"#64748b",lineHeight:1.5,margin:"0 0 10px 0",fontStyle:"italic"}}>Accuracy (1-5) · Completeness (1-5) · Tone appropriateness · Reasoning quality · Source relevance</p>
+          <p style={{fontSize:10,color:"#60a5fa",fontWeight:600,margin:0}}>Can be designed by: External experts (foundational) or Internal SMEs (complex tasks)</p></div></div>
+    </div>
+    <h3 style={{fontSize:13,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:16}}>Rubric Lifecycle</h3>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:8,marginBottom:28}}>
+      {lifecycle.map((step,i)=><div key={i} style={{background:"#111827",borderRadius:10,padding:"14px",border:"1px solid #1e293b",position:"relative"}}>
+        {i<5&&<div style={{position:"absolute",right:-8,top:"50%",transform:"translateY(-50%)",color:"#334155",fontSize:16,zIndex:1}}>→</div>}
+        <div style={{fontSize:10,fontWeight:700,color:step.color,letterSpacing:"0.06em",textTransform:"uppercase",marginBottom:6}}>{step.label}</div>
+        <p style={{fontSize:10,color:"#94a3b8",lineHeight:1.5,margin:0}}>{step.desc}</p></div>)}</div>
+    <h3 style={{fontSize:13,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:16}}>Rubric Design Tier vs. Execution Tier by Task</h3>
+    <div style={{overflowX:"auto",marginBottom:20}}>
+      <table style={{width:"100%",borderCollapse:"separate",borderSpacing:0}}>
+        <thead><tr><th style={{...th,width:36,textAlign:"center"}}>#</th><th style={{...th,width:"28%"}}>Task Type</th>
+          <th style={{...th,textAlign:"center"}}>Rubric Design Tier</th><th style={{...th,textAlign:"center"}}>Rubric Execution Tier</th><th style={{...th,textAlign:"center"}}>Tier Shift</th></tr></thead>
+        <tbody>{Object.keys(grouped).sort().flatMap(c=>grouped[c].map((task,tIdx)=>{
+          const dClr=tC[task.rubricDesignTier];const eClr=tC[task.rubricExecTier];
+          const same=task.rubricDesignTier===task.rubricExecTier;
+          const shift=tierRank[task.rubricDesignTier]-tierRank[task.rubricExecTier];
+          const isSel=selectedTask===task.id;
+          return <tr key={task.id} onClick={()=>setSelectedTask(isSel?null:task.id)} style={{cursor:"pointer",background:isSel?"#1e293b44":"transparent"}}>
+            <td style={{...td,textAlign:"center",borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}><span style={{fontSize:11,fontFamily:"'IBM Plex Mono',monospace",color:"#475569"}}>{task.id}</span></td>
+            <td style={{...td,borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}>
+              {tIdx===0&&<div style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:cxC[c],marginBottom:4,opacity:0.8}}>{cxL[c]}</div>}
+              <div style={{fontSize:12,fontWeight:600,color:"#e2e8f0"}}>{task.name}</div></td>
+            <td style={{...td,textAlign:"center",borderLeft:"1px solid #1e293b22",borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}><span style={badge(dClr)}>{tL[task.rubricDesignTier]}</span></td>
+            <td style={{...td,textAlign:"center",borderLeft:"1px solid #1e293b22",borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}><span style={badge(eClr)}>{tL[task.rubricExecTier]}</span></td>
+            <td style={{...td,textAlign:"center",borderLeft:"1px solid #1e293b22",borderTop:tIdx===0?`2px solid ${cxC[c]}33`:"none"}}>
+              {same?<span style={{fontSize:11,color:"#64748b"}}>Same tier</span>:<span style={{fontSize:11,fontWeight:600,color:"#f472b6"}}>+{shift} tier{shift>1?"s":""} for design</span>}</td>
+          </tr>}))}</tbody></table></div>
+    {selectedTask&&(()=>{const task=tasks.find(t=>t.id===selectedTask);return <div style={{background:"#111827",borderRadius:12,padding:"18px 22px",border:"1px solid #334155",marginBottom:20}}>
+      <h4 style={{fontSize:14,fontWeight:700,color:"#e2e8f0",marginBottom:8}}>{task.name} — Rubric Notes</h4>
+      <p style={{fontSize:12,color:"#94a3b8",lineHeight:1.65,margin:0}}>{task.rubricNotes}</p></div>})()}
+    <p style={{fontSize:11,color:"#64748b",fontStyle:"italic"}}>Click any row to see task-specific rubric design notes.</p>
+  </div>;
+}
+
+// ═══ TAB 5: ADJUDICATION & APPEALS ═══
+function AdjudicationTab(){
+  const flowSteps=[
+    {label:"Initial Annotation",desc:"Lower-tier annotators label data points against the rubric. Multiple annotators per item enable disagreement detection.",tier:"general",color:"#3b82f6"},
+    {label:"Agreement Check",desc:"Automated measurement of inter-annotator agreement. High-agreement items proceed directly to the golden dataset.",tier:null,color:"#64748b"},
+    {label:"Disagreement Triage",desc:"Flagged items are categorized: rubric ambiguity, genuine edge case, or annotator error.",tier:null,color:"#f59e0b"},
+    {label:"SME Adjudication",desc:"Internal SMEs review only the contested cases — typically 10-20% of total volume. They render a final judgment and document reasoning.",tier:"internal",color:"#f472b6"},
+    {label:"Resolution & Encoding",desc:"The data point gets its gold label, and the reasoning updates the rubric for future annotation.",tier:null,color:"#10b981"}];
+  const principles=[
+    {title:"SME time is concentrated, not spread",desc:"Instead of SMEs annotating every data point, they review only contested cases. A typical ratio: 100 items annotated by general annotators, 15 escalated for adjudication. SME throughput increases 5-7x."},
+    {title:"Disagreement is signal, not noise",desc:"Items where annotators disagree are the most informative for evaluation. They reveal rubric gaps, task boundary ambiguities, and the specific cases where agentic systems are most likely to fail."},
+    {title:"Adjudication refines rubrics",desc:"Every adjudication decision is a micro-update to the annotation framework. Over time, the rubric absorbs the expert knowledge embedded in adjudication reasoning — reducing future escalation rates."},
+    {title:"Appeals preserve annotator expertise",desc:"Lower-tier annotators can appeal adjudication decisions with documented reasoning. This prevents rubric ossification — sometimes the generalist spots something the expert missed."}];
+  const escModel=[
+    {scenario:"Foundational (1-3)",initial:"General Annotators",adj:"External Domain Experts",rate:"5-10%",notes:"Low disagreement expected. Most escalations are rubric ambiguity."},
+    {scenario:"Intermediate (4-6)",initial:"External Domain Experts",adj:"Internal Client SMEs",rate:"10-20%",notes:"Domain knowledge reduces noise, but institutional specifics drive disagreement."},
+    {scenario:"Advanced (7-9)",initial:"Internal SMEs (dual review)",adj:"Senior SME / Panel",rate:"15-25%",notes:"Peer disagreement indicates genuine complexity. Panel adjudication may be required."},
+    {scenario:"Expert-Critical (10-12)",initial:"Internal Client SMEs",adj:"Cross-functional Panel",rate:"20-30%",notes:"Highest disagreement rates. Often involves compliance, legal, or operations."}];
+  return <div>
+    <div style={{background:"#111827",borderRadius:12,padding:"20px 24px",marginBottom:24,border:"1px solid #334155"}}>
+      <h3 style={{fontSize:15,fontWeight:700,color:"#e2e8f0",marginBottom:8}}>Adjudication as an SME Scaling Mechanism</h3>
+      <p style={{fontSize:12,color:"#94a3b8",lineHeight:1.65,margin:0}}>The scarcity of internal SMEs is the binding constraint on golden dataset development. Adjudication reframes this from a staffing problem into a routing problem: rather than having SMEs annotate everything, lower tiers annotate first and SMEs adjudicate only the contested cases. This concentrates expert attention on the data points that matter most.</p></div>
+    <h3 style={{fontSize:13,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:16}}>Escalation Flow</h3>
+    <div style={{display:"flex",gap:6,marginBottom:28,overflowX:"auto"}}>
+      {flowSteps.map((step,i)=><div key={i} style={{flex:"1 0 170px",position:"relative"}}>
+        <div style={{background:"#111827",borderRadius:10,padding:"16px 14px",border:`1px solid ${step.color}33`,minHeight:160}}>
+          <div style={{width:28,height:28,borderRadius:14,background:step.color+"22",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:10}}>
+            <span style={{fontSize:12,fontWeight:700,color:step.color}}>{i+1}</span></div>
+          <div style={{fontSize:12,fontWeight:700,color:"#e2e8f0",marginBottom:6}}>{step.label}</div>
+          <p style={{fontSize:10,color:"#94a3b8",lineHeight:1.5,margin:0}}>{step.desc}</p>
+          {step.tier&&<div style={{marginTop:8}}><span style={{fontSize:9,padding:"2px 6px",borderRadius:3,background:tC[step.tier]+"22",color:tC[step.tier],fontWeight:600,border:`1px solid ${tC[step.tier]}33`}}>{tL[step.tier]}</span></div>}</div>
+        {i<flowSteps.length-1&&<div style={{position:"absolute",right:-6,top:"50%",transform:"translateY(-50%)",color:"#334155",fontSize:14,zIndex:1}}>→</div>}</div>)}</div>
+    <h3 style={{fontSize:13,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:16}}>Operating Principles</h3>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,marginBottom:28}}>
+      {principles.map((p,i)=><div key={i} style={{background:"#111827",borderRadius:10,padding:"16px 18px",border:"1px solid #1e293b"}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",marginBottom:6}}>{p.title}</div>
+        <p style={{fontSize:11,color:"#94a3b8",lineHeight:1.55,margin:0}}>{p.desc}</p></div>)}</div>
+    <h3 style={{fontSize:13,fontWeight:700,color:"#475569",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:16}}>Escalation Model by Task Complexity</h3>
+    <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"separate",borderSpacing:0}}>
+      <thead><tr><th style={th}>Task Group</th><th style={th}>Initial Annotator</th><th style={th}>Adjudicator</th><th style={{...th,textAlign:"center"}}>Escalation Rate</th><th style={th}>Notes</th></tr></thead>
+      <tbody>{escModel.map((row,i)=><tr key={i}>
+        <td style={{...td,fontWeight:600,color:"#e2e8f0",fontSize:12}}>{row.scenario}</td>
+        <td style={{...td,fontSize:11,color:"#cbd5e1"}}>{row.initial}</td>
+        <td style={{...td,fontSize:11,color:"#cbd5e1"}}>{row.adj}</td>
+        <td style={{...td,textAlign:"center"}}><span style={badge("#f59e0b")}>{row.rate}</span></td>
+        <td style={{...td,fontSize:10,color:"#94a3b8"}}>{row.notes}</td></tr>)}</tbody></table></div>
+  </div>;
+}
+
+// ═══ MAIN APP ═══
+function App(){
+  const[tab,setTab]=useState("tasks");
+  const tabs=[{key:"tasks",label:"Task Matrix"},{key:"governance",label:"Governance"},{key:"combined",label:"Combined Filter"},{key:"rubric",label:"Rubric Design"},{key:"adjudication",label:"Adjudication"}];
+  return <div style={{minHeight:"100vh",padding:"32px 24px"}}>
+    <div style={{maxWidth:1320,margin:"0 auto 28px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:6}}>
+        <div style={{width:4,height:32,borderRadius:2,background:"linear-gradient(180deg,#10b981,#3b82f6,#f472b6)"}}/>
+        <h1 style={{fontSize:24,fontWeight:700,letterSpacing:"-0.02em",background:"linear-gradient(135deg,#e2e8f0,#94a3b8)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Golden Dataset Development Framework</h1></div>
+      <p style={{fontSize:13,color:"#64748b",marginLeft:16,maxWidth:620,lineHeight:1.5}}>A framework for classifying annotation requirements and operationalizing golden dataset development for production agentic systems</p>
+      <div style={{display:"flex",gap:2,marginTop:24,borderBottom:"1px solid #1e293b",overflowX:"auto"}}>
+        {tabs.map(t=><button key={t.key} onClick={()=>setTab(t.key)} style={{padding:"10px 18px",border:"none",cursor:"pointer",fontSize:12,fontWeight:600,borderRadius:"8px 8px 0 0",whiteSpace:"nowrap",background:tab===t.key?"#111827":"transparent",color:tab===t.key?"#e2e8f0":"#64748b",borderBottom:tab===t.key?"2px solid #3b82f6":"2px solid transparent"}}>{t.label}</button>)}</div></div>
+    <div style={{maxWidth:1320,margin:"0 auto"}}>
+      {tab==="tasks"&&<TaskMatrix/>}{tab==="governance"&&<GovernanceTab/>}{tab==="combined"&&<CombinedView/>}{tab==="rubric"&&<RubricTab/>}{tab==="adjudication"&&<AdjudicationTab/>}
+    </div></div>;
+}
+ReactDOM.render(<App/>,document.getElementById("root"));
+
+<\/script>
+</body>
+</html>
